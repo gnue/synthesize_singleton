@@ -5,7 +5,7 @@
 = Objective-C のシングルトンのひな形を生成する
 
 Authors::   GNUE(鵺)
-Version::   1.0 2010-12-29 gnue
+Version::   1.0.1 2010-12-30 gnue
 Copyright:: Copyright (C) gnue, 2010. All rights reserved.
 License::   MIT ライセンスに準拠
 
@@ -19,6 +19,8 @@ $ synthesize_singleton.rb ClassName...
 
 == 開発履歴
 
+* 1.0.1 2010-12-30
+  * 実装のひな形をヒアドキュメントから DATA.read を使うように変更
 * 1.0 2010-12-29
   * とりあえず作ってみた
 
@@ -27,64 +29,88 @@ $ synthesize_singleton.rb ClassName...
 
 class CocoaSingleton
 	def initialize(className)
-        @className = className
+        @className = capitalize(className)
+	end
+
+	def capitalize(str)
+		# 先頭文字のみ大文字にして後ろは変更しない
+		str.gsub(/^./) { $&.upcase }
 	end
 
 	def ganerate(className = @className)
+		# ヘッダと実装のひな形をファイルに書き出す
 		File.open("#{className}.h", 'w') { |f|
-			f.print ganerate_interface(className)
+			f.print interface(className)
 		}
 
 		File.open("#{className}.m", 'w') { |f|
-			f.print ganerate_implementation(className)
+			f.print implementation(className)
 		}
 	end
 
-	def ganerate_interface(className = @className)
+	def interface(className = @className)
 		# ヘッダの生成
-		<<EOS
+		<<-"EOS"
 #import <Cocoa/Cocoa.h>
 
 
 @interface #{className} : NSObject {
 }
 
-+ (#{className}*)shared#{className};
++ (#{className} *)shared#{className};
 
 @end
-EOS
+		EOS
 	end
 
-	def ganerate_implementation(className = @className)
+	def implementation(className = @className)
 		# 実装の生成
-		<<EOS
-#import "#{className}.h"
+		DATA.read.gsub(/FooBar/, className)
+	end
+end
 
 
-static #{className} *shared#{className} = nil;
+if ARGV.length == 0
+	cmd = File.basename $0
+	print "Usage: #{cmd} ClassName...\n"
+	exit
+end
+
+ARGV.each { |className|
+	singleton = CocoaSingleton.new(className)
+	singleton.ganerate
+}
 
 
-@implementation #{className}
+__END__
+
+#import "FooBar.h"
+
+
+static FooBar *sharedFooBar = nil;
+
+
+@implementation FooBar
 
 #pragma mark -
 #pragma mark シングルトン
 
-+ (#{className}*)shared#{className}
++ (FooBar *)sharedFooBar
 {
     @synchronized(self) {
-        if (shared#{className}  == nil) {
+        if (sharedFooBar  == nil) {
             [[self alloc] init]; // ここでは代入していない
         }
     }
-    return shared#{className};
+    return sharedFooBar;
 }
 
 + (id)allocWithZone:(NSZone *)zone
 {
 	@synchronized(self) {
-		if (shared#{className} == nil) {
-            shared#{className} = [super allocWithZone:zone];
-            return shared#{className};  // 最初の割り当てで代入し、返す
+		if (sharedFooBar == nil) {
+            sharedFooBar = [super allocWithZone:zone];
+            return sharedFooBar;  // 最初の割り当てで代入し、返す
         }
     }
     return nil; // 以降の割り当てではnilを返すようにする
@@ -116,18 +142,3 @@ static #{className} *shared#{className} = nil;
 }
 
 @end
-EOS
-	end
-end
-
-
-if ARGV.length == 0
-	cmd = File.basename $0
-	print "Usage: #{cmd} ClassName...\n"
-	exit
-end
-
-ARGV.each { |className|
-	singleton = CocoaSingleton.new(className)
-	singleton.ganerate
-}
