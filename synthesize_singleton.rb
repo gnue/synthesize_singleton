@@ -5,7 +5,7 @@
 = Objective-C のシングルトンのひな形を生成する
 
 Authors::   GNUE(鵺)
-Version::   1.0.1 2010-12-30 gnue
+Version::   1.0.2 2010-12-30 gnue
 Copyright:: Copyright (C) gnue, 2010. All rights reserved.
 License::   MIT ライセンスに準拠
 
@@ -19,6 +19,8 @@ $ synthesize_singleton.rb ClassName...
 
 == 開発履歴
 
+* 1.0.2 2010-12-30
+  * インデントを修正
 * 1.0.1 2010-12-30
   * 実装のひな形をヒアドキュメントから DATA.read を使うように変更
 * 1.0 2010-12-29
@@ -97,48 +99,48 @@ static FooBar *sharedFooBar = nil;
 
 + (FooBar *)sharedFooBar
 {
-    @synchronized(self) {
-        if (sharedFooBar  == nil) {
-            [[self alloc] init]; // ここでは代入していない
-        }
-    }
-    return sharedFooBar;
+	@synchronized(self) {
+		if (sharedFooBar  == nil) {
+			[[self alloc] init]; // ここでは代入していない
+		}
+	}
+	return sharedFooBar;
 }
 
 + (id)allocWithZone:(NSZone *)zone
 {
 	@synchronized(self) {
 		if (sharedFooBar == nil) {
-            sharedFooBar = [super allocWithZone:zone];
-            return sharedFooBar;  // 最初の割り当てで代入し、返す
-        }
-    }
-    return nil; // 以降の割り当てではnilを返すようにする
+			sharedFooBar = [super allocWithZone:zone];
+			return sharedFooBar;  // 最初の割り当てで代入し、返す
+		}
+	}
+	return nil; // 以降の割り当てではnilを返すようにする
 }
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    return self;
+	return self;
 }
 
 - (id)retain
 {
-    return self;
+	return self;
 }
 
 - (NSUInteger)retainCount
 {
-    return UINT_MAX;  // 解放できないオブジェクトであることを示す
+	return UINT_MAX;  // 解放できないオブジェクトであることを示す
 }
 
 - (void)release
 {
-    // 何もしない
+	// 何もしない
 }
 
 - (id)autorelease
 {
-    return self;
+	return self;
 }
 
 @end
