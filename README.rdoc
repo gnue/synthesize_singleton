@@ -1,0 +1,25 @@
+
+= Objective-C のシングルトンのひな形を生成する
+
+Authors::   GNUE(鵺)
+Version::   1.0.2 2010-12-30 gnue
+Copyright:: Copyright (C) gnue, 2010. All rights reserved.
+License::   MIT ライセンスに準拠
+
+　Objective-C のシングルトンのひな形を生成する
+
+== 使い方
+
+$ synthesize_singleton.rb ClassName...
+
+== TODO
+
+== 開発履歴
+
+* 1.0.2 2010-12-30
+  * インデントを修正
+* 1.0.1 2010-12-30
+  * 実装のひな形をヒアドキュメントから DATA.read を使うように変更
+* 1.0 2010-12-29
+  * とりあえず作ってみた
+
